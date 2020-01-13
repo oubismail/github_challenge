@@ -30,7 +30,9 @@ class MainFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        repoListAdapter  = RepoListAdapter()
+        repoListAdapter = RepoListAdapter()
+        viewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
+        viewModel.refresh()
     }
 
     override fun onCreateView(
@@ -42,24 +44,40 @@ class MainFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
+
         repoRecyclerView.adapter = repoListAdapter
         repoRecyclerView.layoutManager = LinearLayoutManager(context)
-        val dividerItemDecoration = DividerItemDecoration(
-            context,
-            DividerItemDecoration.VERTICAL)
+        repoRecyclerView.addItemDecoration(
+            DividerItemDecoration(
+                context,
+                DividerItemDecoration.VERTICAL
+            )
+        )
 
-        repoRecyclerView.addItemDecoration(dividerItemDecoration)
+        swipeRefresh.setOnRefreshListener {
+            viewModel.refresh()
+        }
+
         CoroutineScope(Dispatchers.Main).launch {
-            viewModel.getTopStarredRepos().observe(viewLifecycleOwner, Observer { result ->
-                when(result.status) {
+            viewModel.reposList.observe(viewLifecycleOwner, Observer { result ->
+                when (result.status) {
                     Result.Status.SUCCESS -> result?.data?.items?.let {
                         repoRecyclerView.visibility = View.VISIBLE
                         repoListAdapter.show(it)
                     }
-                    Result.Status.ERROR -> Toast.makeText(context,"Error network",Toast.LENGTH_SHORT ).show()
-                    Result.Status.LOADING -> progressBar.visibility = View.VISIBLE
-                    Result.Status.COMPLETE -> progressBar.visibility = View.GONE
+                    Result.Status.ERROR -> Toast.makeText(
+                        context,
+                        "Error network",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    Result.Status.LOADING -> {
+                        if (!swipeRefresh.isRefreshing)
+                            progressBar.visibility = View.VISIBLE
+                    }
+                    Result.Status.COMPLETE -> {
+                        swipeRefresh.isRefreshing = false
+                        progressBar.visibility = View.GONE
+                    }
                 }
 
             })
