@@ -17,10 +17,6 @@ class MainViewModel : ViewModel() {
         GitHubApiRepo.getTopStarredRepos()
     }
 
-    private fun getTopStarredRepos(): LiveData<Result<GitHubApiResult>> {
-        return GitHubApiRepo.getTopStarredRepos()
-    }
-
     fun refresh(){
         reloadTrigger.value = true
     }
