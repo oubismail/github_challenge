@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -11,6 +12,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.toprepo.R
 import com.github.toprepo.adapters.RepoListAdapter
+import com.github.toprepo.network.Result
 import kotlinx.android.synthetic.main.main_fragment.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -50,9 +52,16 @@ class MainFragment : Fragment() {
         repoRecyclerView.addItemDecoration(dividerItemDecoration)
         CoroutineScope(Dispatchers.Main).launch {
             viewModel.getTopStarredRepos().observe(viewLifecycleOwner, Observer { result ->
-                result?.data?.items?.let {
-                    repoListAdapter.show(it)
+                when(result.status) {
+                    Result.Status.SUCCESS -> result?.data?.items?.let {
+                        repoRecyclerView.visibility = View.VISIBLE
+                        repoListAdapter.show(it)
+                    }
+                    Result.Status.ERROR -> Toast.makeText(context,"Error network",Toast.LENGTH_SHORT ).show()
+                    Result.Status.LOADING -> progressBar.visibility = View.VISIBLE
+                    Result.Status.COMPLETE -> progressBar.visibility = View.GONE
                 }
+
             })
         }
     }
