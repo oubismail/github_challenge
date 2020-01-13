@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.github.toprepo.R
 import com.github.toprepo.models.Item
 import kotlinx.android.synthetic.main.repo_item.view.*
@@ -35,6 +36,9 @@ class RepoListAdapter : RecyclerView.Adapter<RepoListAdapter.RepoListViewHolder>
         }
         holder.itemView.repoUserName.text = item.owner.login
         holder.itemView.repoStarCount.text = item.stargazersCount?.toString() ?: "0"
+        Glide.with(holder.itemView)
+            .load(item.owner.avatarUrl)
+            .into(holder.itemView.repoUserAvatar)
     }
 
     fun show(repos: List<Item>) {
