@@ -7,6 +7,6 @@ import retrofit2.http.QueryMap
 
 interface GithubService {
     @GET("repositories")
-    suspend fun getTop(
+    suspend fun getTopRepos(
         @QueryMap options: HashMap<String, String>) : Response<GitHubApiResult>
 }
