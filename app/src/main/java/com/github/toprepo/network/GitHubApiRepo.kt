@@ -5,7 +5,7 @@ import com.github.toprepo.models.GitHubApiResult
 import java.text.SimpleDateFormat
 import java.util.*
 
-object GitHubApiRepo : BaseDataSource() {
+class GitHubApiRepo : BaseDataSource() {
 
     private val service: GithubService = GitHubAPI.create();
 

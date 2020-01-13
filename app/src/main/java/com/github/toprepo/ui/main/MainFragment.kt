@@ -31,7 +31,9 @@ class MainFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         repoListAdapter = RepoListAdapter()
-        viewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
+        val mainViewModelFactory = MainViewModelFactory(context)
+        viewModel = ViewModelProviders.of(this, mainViewModelFactory).get(MainViewModel::class.java)
+//        viewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
         viewModel.refresh()
     }
 
